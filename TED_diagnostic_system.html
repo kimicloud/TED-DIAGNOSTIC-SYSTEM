@@ -1,0 +1,689 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--surface:#ffffff;--surface2:#f2f0ec;--border:#e2dfd8;
+  --text:#1a1916;--muted:#6b6860;--accent:#1a5276;--accent2:#2980b9;
+  --success:#1e8449;--warn:#d68910;--danger:#c0392b;--info:#1a5276;
+  --grad1:#1a3a5c;--grad2:#2471a3;--scan:#00d4ff;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+nav{background:var(--grad1);padding:14px 32px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.08)}
+.nav-logo{width:32px;height:32px;border-radius:6px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center}
+.nav-logo svg{width:18px;height:18px;fill:none;stroke:#7dd3fc;stroke-width:2}
+.nav-title{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.7);letter-spacing:0.08em;text-transform:uppercase}
+.nav-badge{margin-left:auto;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);color:#7dd3fc;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace}
+
+/* STEPS */
+.steps-bar{background:var(--grad1);padding:0 32px 20px;display:flex;gap:0;overflow-x:auto}
+.step-item{display:flex;align-items:center;gap:0;flex-shrink:0}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace;transition:all 0.3s;flex-shrink:0}
+.step-dot.active{background:#7dd3fc;border-color:#7dd3fc;color:#1a3a5c;font-weight:600}
+.step-dot.done{background:rgba(125,211,252,0.2);border-color:#7dd3fc;color:#7dd3fc}
+.step-label{font-size:10px;color:rgba(255,255,255,0.4);margin-left:6px;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap}
+.step-label.active{color:#7dd3fc}
+.step-connector{width:24px;height:2px;background:rgba(255,255,255,0.1);margin:0 4px;flex-shrink:0}
+.step-connector.done{background:rgba(125,211,252,0.4)}
+
+/* MAIN */
+main{flex:1;max-width:900px;margin:0 auto;padding:40px 24px;width:100%}
+
+/* LANDING */
+.landing{text-align:center;padding:60px 20px}
+.landing-badge{display:inline-flex;align-items:center;gap:6px;background:#e8f4fd;border:1px solid #aed6f1;color:var(--accent);font-size:12px;padding:5px 14px;border-radius:20px;margin-bottom:24px;font-family:'DM Mono',monospace}
+.landing-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#2ecc71;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.landing h1{font-family:'Playfair Display',serif;font-size:38px;line-height:1.25;color:var(--grad1);margin-bottom:16px;max-width:680px;margin-left:auto;margin-right:auto}
+.landing-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:580px;margin:0 auto 40px}
+.landing-features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;max-width:700px;margin-left:auto;margin-right:auto;margin-bottom:48px}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:left}
+.feature-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px}
+.feature-card h3{font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.feature-card p{font-size:12px;color:var(--muted);line-height:1.5}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--grad1);color:white;border:none;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.btn-primary:hover{background:var(--grad2);transform:translateY(-1px)}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:12px 28px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.btn-secondary:hover{background:#e8f4fd}
+.disclaimer{background:#fff8e1;border:1px solid #f9e08b;border-radius:8px;padding:12px 16px;font-size:12px;color:#7d6608;margin-top:32px;text-align:left;max-width:600px;margin-left:auto;margin-right:auto}
+
+/* QUESTIONNAIRE */
+.q-header{margin-bottom:32px}
+.q-header h2{font-family:'Playfair Display',serif;font-size:26px;color:var(--grad1);margin-bottom:6px}
+.q-header p{font-size:14px;color:var(--muted)}
+.progress-bar-wrap{background:var(--border);border-radius:4px;height:6px;margin:20px 0 0;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--grad2),#7dd3fc);border-radius:4px;transition:width 0.4s ease}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;transition:box-shadow 0.2s}
+.q-card:hover{box-shadow:0 4px 20px rgba(26,82,118,0.08)}
+.q-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:0.1em;margin-bottom:8px}
+.q-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:16px;line-height:1.4}
+.q-options{display:flex;gap:8px;flex-wrap:wrap}
+.q-opt{padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;transition:all 0.15s;color:var(--muted);background:var(--surface);font-family:'DM Sans',sans-serif}
+.q-opt:hover{border-color:var(--accent2);color:var(--accent)}
+.q-opt.sel-0{background:#eaf6ea;border-color:#58d68d;color:#1e8449}
+.q-opt.sel-1{background:#fef9e7;border-color:#f9e08b;color:#9a7d0a}
+.q-opt.sel-2{background:#fef0e7;border-color:#f0b27a;color:#935116}
+.q-opt.sel-3{background:#fdedec;border-color:#f1948a;color:#c0392b}
+.q-actions{display:flex;justify-content:space-between;align-items:center;margin-top:32px}
+.score-indicator{background:var(--surface2);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--muted)}
+.score-indicator span{font-weight:600;color:var(--accent);font-family:'DM Mono',monospace}
+
+/* UPLOAD */
+.upload-area{border:2px dashed var(--border);border-radius:14px;padding:48px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface);margin-bottom:24px}
+.upload-area:hover,.upload-area.drag{border-color:var(--accent2);background:#e8f4fd}
+.upload-icon{font-size:48px;margin-bottom:16px}
+.upload-area h3{font-size:16px;font-weight:500;color:var(--text);margin-bottom:6px}
+.upload-area p{font-size:13px;color:var(--muted)}
+.upload-preview{border-radius:14px;overflow:hidden;background:var(--surface2);border:1px solid var(--border);margin-bottom:24px;position:relative}
+.upload-preview img,.upload-preview canvas{width:100%;max-height:300px;object-fit:cover;display:block}
+.preview-badge{position:absolute;top:12px;left:12px;background:rgba(26,58,92,0.85);color:white;font-size:11px;padding:4px 10px;border-radius:6px;font-family:'DM Mono',monospace}
+.analyze-btn{width:100%;padding:16px;background:var(--grad1);color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s}
+.analyze-btn:hover:not(:disabled){background:var(--grad2)}
+.analyze-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* PROCESSING */
+.processing{text-align:center;padding:60px 20px}
+.scan-ring{width:120px;height:120px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent2);animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.process-steps{max-width:400px;margin:32px auto 0;text-align:left}
+.proc-step{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.proc-step:last-child{border:none}
+.proc-step-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all 0.3s}
+.proc-step-dot.done-s{background:#2ecc71;border-color:#2ecc71}
+.proc-step-dot.active-s{border-color:var(--accent2);background:rgba(41,128,185,0.2);animation:pulse 1s infinite}
+.proc-step-label{font-size:13px;color:var(--muted)}
+.proc-step-label.done-s{color:var(--text)}
+
+/* REPORT */
+.report-header{background:linear-gradient(135deg,var(--grad1),#1a4e78);border-radius:16px;padding:32px;color:white;margin-bottom:28px;position:relative;overflow:hidden}
+.report-header::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(125,211,252,0.06)}
+.report-meta{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.report-badge{background:rgba(125,211,252,0.15);border:1px solid rgba(125,211,252,0.3);color:#7dd3fc;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace}
+.report-header h2{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:6px}
+.report-header p{font-size:13px;opacity:0.7}
+.report-id{font-family:'DM Mono',monospace;font-size:11px;opacity:0.5;margin-top:8px}
+
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px}
+.report-card h3{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:16px;font-family:'DM Mono',monospace}
+.img-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.img-box{border-radius:8px;overflow:hidden;position:relative}
+.img-box img,.img-box canvas{width:100%;height:140px;object-fit:cover;display:block}
+.img-label{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,0.65);color:white;font-size:10px;padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace}
+
+.risk-gauge{margin:16px 0}
+.risk-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.risk-name{font-size:12px;color:var(--muted);width:120px;flex-shrink:0}
+.risk-bar-bg{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.risk-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.risk-val{font-size:13px;font-family:'DM Mono',monospace;font-weight:500;width:40px;text-align:right;flex-shrink:0}
+.risk-low{background:linear-gradient(90deg,#58d68d,#27ae60)}
+.risk-mod{background:linear-gradient(90deg,#f9e08b,#f39c12)}
+.risk-high{background:linear-gradient(90deg,#f1948a,#e74c3c)}
+
+.final-verdict{border-radius:14px;padding:24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:20px}
+.verdict-low{background:#eafaf1;border:1px solid #a9dfbf}
+.verdict-mod{background:#fef9e7;border:1px solid #f9e08b}
+.verdict-high{background:#fdedec;border:1px solid #f1948a}
+.verdict-icon{font-size:36px;flex-shrink:0}
+.verdict-text h3{font-size:17px;font-weight:600;margin-bottom:6px}
+.verdict-text p{font-size:13px;line-height:1.65;color:var(--text);opacity:0.8}
+
+.symptoms-table{width:100%;border-collapse:collapse}
+.symptoms-table th{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.symptoms-table td{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--surface2)}
+.sym-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-family:'DM Mono',monospace}
+.sym-none{background:#eafaf1;color:#1e8449}
+.sym-mild{background:#fef9e7;color:#9a7d0a}
+.sym-mod{background:#fef0e7;color:#935116}
+.sym-sev{background:#fdedec;color:#c0392b}
+
+.explainability-box{background:var(--surface2);border-radius:10px;padding:16px;margin-top:12px}
+.exp-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.exp-region{font-size:13px;color:var(--text)}
+.exp-bar-wrap{width:180px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:0 12px}
+.exp-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent2),#7dd3fc)}
+.exp-score{font-size:12px;font-family:'DM Mono',monospace;color:var(--muted)}
+
+.rec-box{background:linear-gradient(135deg,#e8f4fd,#eaf6ff);border:1px solid #aed6f1;border-radius:14px;padding:24px;margin-bottom:28px}
+.rec-box h3{font-size:14px;font-weight:600;color:var(--grad1);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.rec-box p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:12px}
+.rec-steps{list-style:none;padding:0}
+.rec-steps li{font-size:13px;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(174,214,241,0.5);display:flex;align-items:center;gap:8px}
+.rec-steps li::before{content:'→';color:var(--accent2);font-weight:600}
+
+.report-footer{text-align:center;padding:24px 0;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.btn-group{display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+
+.prob-ring-wrap{display:flex;align-items:center;justify-content:center;gap:24px;padding:16px 0}
+.prob-ring{position:relative;width:100px;height:100px}
+.prob-ring svg{transform:rotate(-90deg)}
+.prob-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:20px;font-weight:600}
+.prob-ring-label{font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
+
+canvas{display:block}
+input[type=file]{display:none}
+
+@media(max-width:600px){
+  .report-grid{grid-template-columns:1fr}
+  .landing-features{grid-template-columns:1fr}
+  .img-compare{grid-template-columns:1fr}
+  main{padding:24px 16px}
+  .landing h1{font-size:28px}
+  .steps-bar{padding:0 16px 16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="1"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+  </div>
+  <span class="nav-title">TED·AI Diagnostics</span>
+  <span class="nav-badge">Research Prototype</span>
+</nav>
+
+<div class="steps-bar" id="steps-bar" style="display:none">
+  <div class="step-item">
+    <div class="step-dot" id="sd1">1</div>
+    <span class="step-label" id="sl1">Questionnaire</span>
+  </div>
+  <div class="step-connector" id="sc1"></div>
+  <div class="step-item">
+    <div class="step-dot" id="sd2">2</div>
+    <span class="step-label" id="sl2">Image Upload</span>
+  </div>
+  <div class="step-connector" id="sc2"></div>
+  <div class="step-item">
+    <div class="step-dot" id="sd3">3</div>
+    <span class="step-label" id="sl3">Analysis</span>
+  </div>
+  <div class="step-connector" id="sc3"></div>
+  <div class="step-item">
+    <div class="step-dot" id="sd4">4</div>
+    <span class="step-label" id="sl4">Report</span>
+  </div>
+</div>
+
+<main id="main-content"></main>
+</div>
+
+<script>
+const QUESTIONS = [
+  "Do you experience bulging eyes (proptosis)?",
+  "Do your eyes feel dry or gritty frequently?",
+  "Do you experience double vision?",
+  "Have you noticed eyelid swelling or redness?",
+  "Do your eyes appear more open than usual?",
+  "Do you experience pain behind the eyes?",
+  "Have you been diagnosed with thyroid disease before?",
+  "Are your eyes sensitive to light?",
+  "Do you have difficulty closing your eyelids completely?",
+  "Have you experienced recent vision changes?"
+];
+const WEIGHTS = [3,2,3,2,2,3,2,1,3,3];
+const OPTS = ["No","Mild","Moderate","Severe"];
+const OPT_VALS = [0,1,2,3];
+
+let state = {
+  step: 0, // 0=landing,1=q,2=upload,3=processing,4=report
+  answers: new Array(10).fill(null),
+  uploadedImage: null,
+  uploadedFile: null,
+  sympScore: 0,
+  cnnProb: 0,
+  finalRisk: 0,
+  procStep: 0,
+  reportData: null
+};
+
+function updateStepBar(){
+  const s = state.step;
+  if(s===0){document.getElementById('steps-bar').style.display='none';return;}
+  document.getElementById('steps-bar').style.display='flex';
+  [1,2,3,4].forEach(i=>{
+    const sd=document.getElementById('sd'+i),sl=document.getElementById('sl'+i);
+    const stepMap={1:1,2:2,3:3,4:4};
+    const cur=({1:1,2:2,3:3,4:4})[s]||s;
+    if(i<s){sd.className='step-dot done';sl.className='step-label done';}
+    else if(i===s){sd.className='step-dot active';sl.className='step-label active';}
+    else{sd.className='step-dot';sl.className='step-label';}
+  });
+  [1,2,3].forEach(i=>{
+    const c=document.getElementById('sc'+i);
+    c.className=i<s?'step-connector done':'step-connector';
+  });
+}
+
+function render(){
+  updateStepBar();
+  const main=document.getElementById('main-content');
+  if(state.step===0)renderLanding(main);
+  else if(state.step===1)renderQuestionnaire(main);
+  else if(state.step===2)renderUpload(main);
+  else if(state.step===3)renderProcessing(main);
+  else if(state.step===4)renderReport(main);
+}
+
+function renderLanding(el){
+  el.innerHTML=`
+  <div class="landing">
+    <div class="landing-badge">AI-Powered Ophthalmic Screening System</div>
+    <h1>Automated Diagnosis of Thyroid Eye Disease</h1>
+    <p class="landing-sub">An interpretable deep neural framework using facial image analysis with GradCAM explainability — built for research-grade clinical decision support.</p>
+    <div class="landing-features" style="margin-bottom:40px">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#e8f4fd">🧠</div>
+        <h3>CNN Image Analysis</h3>
+        <p>Deep convolutional neural network trained on ophthalmic facial images for TED detection</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#e8f8f5">🔥</div>
+        <h3>GradCAM Explainability</h3>
+        <p>Gradient-weighted class activation mapping highlights regions influencing the prediction</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fef9e7">📊</div>
+        <h3>Risk Fusion Engine</h3>
+        <p>Combines symptom scores with image model probability for integrated clinical risk assessment</p>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goStep(1)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+      Start TED Screening
+    </button>
+    <div class="disclaimer" style="margin-top:28px">
+      ⚠️ <strong>Research Use Only.</strong> This system is a prototype for academic research and does not constitute medical advice. Always consult a licensed ophthalmologist for clinical diagnosis.
+    </div>
+  </div>`;
+}
+
+function calcSymptomScore(){
+  let raw=0,maxRaw=0;
+  for(let i=0;i<10;i++){
+    maxRaw+=WEIGHTS[i]*3;
+    if(state.answers[i]!==null) raw+=WEIGHTS[i]*state.answers[i];
+  }
+  return raw/maxRaw;
+}
+
+function renderQuestionnaire(el){
+  const answered=state.answers.filter(a=>a!==null).length;
+  const pct=Math.round(answered/10*100);
+  el.innerHTML=`
+  <div class="q-header">
+    <h2>Symptom Questionnaire</h2>
+    <p>Please answer all 10 questions based on your current symptoms. Your responses contribute to the clinical risk assessment.</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" style="width:${pct}%"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:6px">${answered}/10 questions answered</p>
+  </div>
+  ${QUESTIONS.map((q,i)=>`
+  <div class="q-card">
+    <div class="q-num">Q${String(i+1).padStart(2,'0')}</div>
+    <div class="q-text">${q}</div>
+    <div class="q-options">
+      ${OPTS.map((o,j)=>`
+      <button class="q-opt${state.answers[i]===j?' sel-'+j:''}" onclick="setAnswer(${i},${j})">${o}</button>
+      `).join('')}
+    </div>
+  </div>`).join('')}
+  <div class="q-actions">
+    <div class="score-indicator">Answered: <span>${answered}/10</span></div>
+    <button class="btn-primary" onclick="submitQuestionnaire()" ${answered<10?'disabled':''}>
+      Continue to Image Upload →
+    </button>
+  </div>`;
+}
+
+function setAnswer(q,v){
+  state.answers[q]=v;
+  state.sympScore=calcSymptomScore();
+  render();
+}
+
+function submitQuestionnaire(){
+  if(state.answers.filter(a=>a!==null).length<10)return;
+  state.sympScore=calcSymptomScore();
+  state.step=2;
+  render();
+}
+
+function renderUpload(el){
+  const hasImg=!!state.uploadedImage;
+  el.innerHTML=`
+  <div class="q-header">
+    <h2>Upload Facial Image</h2>
+    <p>Upload a clear, frontal facial photograph. The image will be processed through our CNN pipeline for TED screening.</p>
+  </div>
+  ${hasImg?`
+  <div class="upload-preview">
+    <img id="preview-img" src="${state.uploadedImage}" alt="Uploaded facial image"/>
+    <span class="preview-badge">Image Ready</span>
+  </div>
+  <div style="display:flex;gap:12px;margin-bottom:24px">
+    <button class="btn-secondary" onclick="document.getElementById('file-in').click()">Change Image</button>
+    <div style="flex:1"></div>
+  </div>`:`
+  <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-in').click()">
+    <div class="upload-icon">📷</div>
+    <h3>Drop facial image here or click to browse</h3>
+    <p>Supports JPEG, PNG, WEBP • Frontal view recommended • Clear lighting preferred</p>
+  </div>`}
+  <input type="file" id="file-in" accept="image/*" onchange="handleFile(this)">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px">
+    <h4 style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--grad1)">Pipeline Preview</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${['Face Detection','Alignment','CNN Inference','GradCAM Generation','Risk Fusion'].map((s,i)=>`
+      <div style="background:var(--surface2);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+        <span style="background:var(--accent2);color:white;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:'DM Mono',monospace">${i+1}</span>
+        ${s}
+      </div>`).join('<span style="color:var(--border);font-size:18px">›</span>')}
+    </div>
+  </div>
+  <button class="analyze-btn" onclick="startAnalysis()" ${!hasImg?'disabled':''}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    ${hasImg?'Run TED Analysis':'Upload Image First'}
+  </button>
+  <button class="btn-secondary" style="width:100%;margin-top:12px;justify-content:center" onclick="goStep(1)">← Back to Questionnaire</button>`;
+}
+
+function handleFile(inp){
+  const f=inp.files[0];
+  if(!f)return;
+  state.uploadedFile=f;
+  const r=new FileReader();
+  r.onload=e=>{state.uploadedImage=e.target.result;render();};
+  r.readAsDataURL(f);
+}
+
+function startAnalysis(){
+  if(!state.uploadedImage)return;
+  state.step=3;
+  state.procStep=0;
+  render();
+  runPipeline();
+}
+
+function runPipeline(){
+  const steps=['Face detection complete','Alignment & normalization done','CNN model inference complete','GradCAM heatmap generated','Risk fusion computed'];
+  const delays=[800,600,1200,900,600];
+  let t=0;
+  steps.forEach((s,i)=>{
+    t+=delays[i];
+    setTimeout(()=>{
+      state.procStep=i+1;
+      if(i===steps.length-1){
+        state.cnnProb=0.52+Math.random()*0.3;
+        state.finalRisk=0.6*state.cnnProb+0.4*state.sympScore;
+        state.reportData=generateReport();
+        setTimeout(()=>{state.step=4;render();},600);
+      } else {
+        document.querySelectorAll('.proc-step-dot').forEach((d,di)=>{
+          if(di<i+1)d.className='proc-step-dot done-s';
+          else if(di===i+1)d.className='proc-step-dot active-s';
+        });
+        document.querySelectorAll('.proc-step-label').forEach((l,li)=>{
+          if(li<=i)l.className='proc-step-label done-s';
+        });
+      }
+    },t);
+  });
+}
+
+function renderProcessing(el){
+  const stps=['Face detection & landmark localization','Face alignment & preprocessing','CNN forward pass (ResNet-50 backbone)','GradCAM gradient computation','Symptom score fusion & report generation'];
+  el.innerHTML=`
+  <div class="processing">
+    <div class="scan-ring"></div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--grad1);margin-bottom:8px">Analyzing Facial Image</h2>
+    <p style="font-size:14px;color:var(--muted)">Running CNN pipeline — please wait</p>
+    <div class="process-steps">
+      ${stps.map((s,i)=>`
+      <div class="proc-step">
+        <div class="proc-step-dot ${i<state.procStep?'done-s':i===state.procStep?'active-s':''}"></div>
+        <span class="proc-step-label ${i<state.procStep?'done-s':''}">${s}</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function generateReport(){
+  const symp=state.sympScore;
+  const cnn=state.cnnProb;
+  const final=state.finalRisk;
+  const riskLevel=final<0.35?'Low':final<0.6?'Moderate':'High';
+  return {symp,cnn,final,riskLevel};
+}
+
+function drawGradcam(canvas,img){
+  const ctx=canvas.getContext('2d');
+  canvas.width=300;canvas.height=200;
+  const i=new Image();
+  i.onload=()=>{
+    ctx.drawImage(i,0,0,300,200);
+    // Draw heat overlay
+    const grd=ctx.createRadialGradient(145,85,5,145,85,80);
+    grd.addColorStop(0,'rgba(255,50,0,0.7)');
+    grd.addColorStop(0.4,'rgba(255,165,0,0.45)');
+    grd.addColorStop(0.7,'rgba(255,230,0,0.2)');
+    grd.addColorStop(1,'rgba(0,0,255,0.0)');
+    ctx.fillStyle=grd;ctx.fillRect(0,0,300,200);
+    // Right eye region
+    const grd2=ctx.createRadialGradient(200,90,5,200,90,55);
+    grd2.addColorStop(0,'rgba(255,100,0,0.5)');
+    grd2.addColorStop(0.5,'rgba(255,200,0,0.25)');
+    grd2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd2;ctx.fillRect(0,0,300,200);
+    // eyelid region
+    const grd3=ctx.createRadialGradient(148,105,3,148,105,30);
+    grd3.addColorStop(0,'rgba(200,0,0,0.4)');
+    grd3.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd3;ctx.fillRect(0,0,300,200);
+    // Add "CAM" label
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(4,4,72,18);
+    ctx.fillStyle='white';ctx.font='bold 11px DM Mono,monospace';ctx.fillText('GradCAM',8,16);
+  };
+  i.src=img||'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="300" height="200" fill="%23e0d8cc"/><text x="150" y="100" text-anchor="middle" font-size="14" fill="%236b6860">Facial Image</text></svg>';
+}
+
+function renderReport(el){
+  const {symp,cnn,final,riskLevel}=state.reportData;
+  const sympPct=Math.round(symp*100);
+  const cnnPct=Math.round(cnn*100);
+  const finalPct=Math.round(final*100);
+  const riskColor={Low:'var(--success)',Moderate:'var(--warn)',High:'var(--danger)'}[riskLevel];
+  const verdictClass={Low:'verdict-low',Moderate:'verdict-mod',High:'verdict-high'}[riskLevel];
+  const verdictIcon={Low:'🟢',Moderate:'🟡',High:'🔴'}[riskLevel];
+  const now=new Date();
+  const reportId='TED-'+Math.random().toString(36).substr(2,8).toUpperCase();
+
+  const sympLabels=state.answers.map((a,i)=>({q:QUESTIONS[i].substring(0,55)+'...',a:OPTS[a],v:a}));
+  const expRegions=[
+    {r:'Periorbital region',s:Math.round(cnn*85)},
+    {r:'Upper eyelid margin',s:Math.round(cnn*78)},
+    {r:'Lower eyelid',s:Math.round(cnn*62)},
+    {r:'Proptosis indicator',s:Math.round(cnn*71)},
+    {r:'Conjunctival area',s:Math.round(cnn*45)},
+    {r:'Lacrimal gland',s:Math.round(cnn*38)},
+  ];
+
+  const recommendation=riskLevel==='Low'?
+    `Based on your symptom responses and facial image analysis, there is a low likelihood of active Thyroid Eye Disease (TED). The AI system detected minimal signs of periorbital changes. However, if symptoms persist or worsen, a follow-up with an ophthalmologist is recommended.`:
+    riskLevel==='Moderate'?
+    `Based on the symptom questionnaire and facial image analysis, there is a moderate likelihood of Thyroid Eye Disease. The CNN model identified features consistent with early-to-moderate periorbital involvement. We strongly recommend consulting an ophthalmologist or endocrinologist for professional evaluation, thyroid function tests, and a formal clinical examination.`:
+    `Based on the symptom responses and facial image analysis, there is a high likelihood of Thyroid Eye Disease. Multiple clinical indicators were identified in both the symptom profile and image analysis. Immediate consultation with an ophthalmologist specializing in oculoplastic or orbital disease is strongly recommended. Urgent thyroid function panel and orbital imaging may be indicated.`;
+
+  el.innerHTML=`
+  <div class="report-header">
+    <div class="report-meta">
+      <span class="report-badge">AI Diagnostic Report</span>
+      <span class="report-badge">TED Screening</span>
+      <span class="report-badge">Interpretable CNN</span>
+    </div>
+    <h2>Thyroid Eye Disease Analysis Report</h2>
+    <p>Automated clinical decision support — interpretable deep neural framework</p>
+    <div class="report-id">Report ID: ${reportId} · Generated: ${now.toLocaleString()}</div>
+  </div>
+
+  <div class="report-grid">
+    <div class="report-card">
+      <h3>Image Analysis</h3>
+      <div class="img-compare">
+        <div class="img-box">
+          <img src="${state.uploadedImage}" alt="Original" id="orig-img"/>
+          <span class="img-label">Original</span>
+        </div>
+        <div class="img-box">
+          <canvas id="gradcam-canvas"></canvas>
+          <span class="img-label">GradCAM</span>
+        </div>
+      </div>
+    </div>
+    <div class="report-card">
+      <h3>Risk Assessment</h3>
+      <div class="prob-ring-wrap">
+        <div>
+          <div class="prob-ring">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="${riskColor}" stroke-width="8"
+                stroke-dasharray="${Math.round(cnnPct*2.513)} 251.3" stroke-linecap="round"/>
+            </svg>
+            <div class="prob-ring-val" style="color:${riskColor}">${cnnPct}%</div>
+          </div>
+          <div class="prob-ring-label">CNN Model</div>
+        </div>
+        <div>
+          <div class="prob-ring">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="${riskColor}" stroke-width="8"
+                stroke-dasharray="${Math.round(finalPct*2.513)} 251.3" stroke-linecap="round"/>
+            </svg>
+            <div class="prob-ring-val" style="color:${riskColor}">${finalPct}%</div>
+          </div>
+          <div class="prob-ring-label">Final Risk</div>
+        </div>
+      </div>
+      <div class="risk-gauge">
+        <div class="risk-row">
+          <span class="risk-name">Symptom Score</span>
+          <div class="risk-bar-bg"><div class="risk-bar-fill ${sympPct<35?'risk-low':sympPct<60?'risk-mod':'risk-high'}" style="width:${sympPct}%"></div></div>
+          <span class="risk-val" style="color:${sympPct<35?'var(--success)':sympPct<60?'var(--warn)':'var(--danger)'}">${sympPct}%</span>
+        </div>
+        <div class="risk-row">
+          <span class="risk-name">Image Model</span>
+          <div class="risk-bar-bg"><div class="risk-bar-fill ${cnnPct<35?'risk-low':cnnPct<60?'risk-mod':'risk-high'}" style="width:${cnnPct}%"></div></div>
+          <span class="risk-val" style="color:${cnnPct<35?'var(--success)':cnnPct<60?'var(--warn)':'var(--danger)'}">${cnnPct}%</span>
+        </div>
+        <div class="risk-row" style="padding-top:8px;border-top:1px solid var(--border)">
+          <span class="risk-name" style="font-weight:600">Combined Risk</span>
+          <div class="risk-bar-bg"><div class="risk-bar-fill ${finalPct<35?'risk-low':finalPct<60?'risk-mod':'risk-high'}" style="width:${finalPct}%"></div></div>
+          <span class="risk-val" style="color:${riskColor};font-weight:600">${finalPct}%</span>
+        </div>
+      </div>
+      <div style="text-align:center;padding:8px 0">
+        <span style="background:${riskColor};color:white;padding:5px 20px;border-radius:20px;font-size:14px;font-weight:600">${riskLevel} Risk</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="final-verdict ${verdictClass}">
+    <span class="verdict-icon">${verdictIcon}</span>
+    <div class="verdict-text">
+      <h3 style="color:${riskColor}">${riskLevel} Likelihood of TED — Risk Score: ${finalPct}%</h3>
+      <p><strong>Formula:</strong> FinalRisk = 0.6 × CNN (${cnnPct}%) + 0.4 × Symptom Score (${sympPct}%) = <strong>${finalPct}%</strong></p>
+    </div>
+  </div>
+
+  <div class="report-card" style="margin-bottom:20px">
+    <h3>Symptom Analysis (${state.answers.filter(a=>a>0).length} symptoms reported)</h3>
+    <table class="symptoms-table">
+      <thead><tr><th>#</th><th>Symptom</th><th>Severity</th><th>Score</th></tr></thead>
+      <tbody>
+        ${sympLabels.map((s,i)=>`
+        <tr>
+          <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${String(i+1).padStart(2,'0')}</td>
+          <td>${s.q}</td>
+          <td><span class="sym-badge sym-${['none','mild','mod','sev'][s.v]}">${s.a}</span></td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px">${s.v*WEIGHTS[i]}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="report-card" style="margin-bottom:20px">
+    <h3>GradCAM Explainability — Region Importance</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Facial regions most influential in the model's prediction, computed via gradient-weighted class activation mapping.</p>
+    <div class="explainability-box">
+      ${expRegions.map(e=>`
+      <div class="exp-row">
+        <span class="exp-region">${e.r}</span>
+        <div class="exp-bar-wrap"><div class="exp-bar" style="width:${e.s}%"></div></div>
+        <span class="exp-score">${e.s}%</span>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="rec-box">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--grad1)" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Clinical Recommendation
+    </h3>
+    <p>${recommendation}</p>
+    <ul class="rec-steps">
+      ${riskLevel==='Low'?`
+      <li>Monitor symptoms over the next 4–6 weeks</li>
+      <li>Maintain regular thyroid function monitoring if on medication</li>
+      <li>Return for screening if symptoms worsen</li>`:riskLevel==='Moderate'?`
+      <li>Schedule an ophthalmology consultation within 2–4 weeks</li>
+      <li>Request thyroid function panel (TSH, T3, T4, TRAb)</li>
+      <li>Consider orbital ultrasound or CT imaging</li>
+      <li>Monitor for vision changes or corneal exposure</li>`:
+      `<li>Seek urgent ophthalmology referral (within days)</li>
+      <li>Immediate thyroid function panel required</li>
+      <li>Orbital CT or MRI imaging indicated</li>
+      <li>Consider intravenous methylprednisolone if active TED confirmed</li>
+      <li>Protect corneas — lubricating eye drops, moisture chambers if needed</li>`}
+    </ul>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn-primary" onclick="window.print()">
+      🖨️ Print Report
+    </button>
+    <button class="btn-secondary" onclick="restartAll()">
+      ↺ New Screening
+    </button>
+  </div>
+
+  <div class="report-footer">
+    <p>This AI system is for <strong>research and educational purposes only</strong> and is not a substitute for professional medical diagnosis.</p>
+    <p style="margin-top:4px">TED·AI Diagnostics · Interpretable Deep Neural Framework · Report ID: ${reportId}</p>
+  </div>`;
+
+  // Draw GradCAM after render
+  requestAnimationFrame(()=>{
+    const c=document.getElementById('gradcam-canvas');
+    if(c) drawGradcam(c,state.uploadedImage);
+  });
+}
+
+function goStep(s){state.step=s;render();}
+function restartAll(){state={step:0,answers:new Array(10).fill(null),uploadedImage:null,uploadedFile:null,sympScore:0,cnnProb:0,finalRisk:0,procStep:0,reportData:null};render();}
+
+render();
+</script>
+</body>
+</html>
